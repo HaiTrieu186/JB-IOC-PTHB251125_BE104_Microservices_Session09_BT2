@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/HaiTrieu186/JB-IOC-PTHB251125_BE104_Microservices_Session09_BT1_Config_Repo.git
+          default-label: main
+
+server:
+  port: 8888
+
+# Cau hinh Actuator (Chuan thuc te)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info" # Mo khoa endpoint kiem tra suc khoe
+  endpoint:
+    health:
+      show-details: always
