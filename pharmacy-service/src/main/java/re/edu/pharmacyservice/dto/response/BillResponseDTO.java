@@ -1,12 +1,16 @@
 package re.edu.pharmacyservice.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class BillResponseDTO {
-    private Double originalPrice;
-    private Double vatRate;
-    private Double finalPrice;
+    private Double subTotal;     // Tổng tiền thuốc (chưa thuế)
+    private Double vatRate;      // % VAT áp dụng tại thời điểm tính (lấy trực tiếp từ config)
+    private Double vatAmount;    // Tiền thuế VAT
+    private Double totalAmount;  // Tổng tiền sau thuế
+    private String branchName;   // Tên chi nhánh (lấy luôn từ config cho tiện kiểm tra)
 }

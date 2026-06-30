@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
+import re.edu.pharmacyservice.dto.request.BillItemDTO;
 import re.edu.pharmacyservice.dto.request.BillRequestDTO;
 import re.edu.pharmacyservice.dto.response.BillResponseDTO;
+import re.edu.pharmacyservice.entity.Medicine;
+import re.edu.pharmacyservice.repository.IMedicineRepository;
 import re.edu.pharmacyservice.service.IBillService;
 
 @Service
@@ -13,21 +16,37 @@ import re.edu.pharmacyservice.service.IBillService;
 @RequiredArgsConstructor
 public class BillServiceImpl implements IBillService {
 
+    private final IMedicineRepository medicineRepository;
+
     @Value("${pharmacy.vat-rate}")
     private Double vatRate;
 
-    @Override
-    public BillResponseDTO calculateBill(BillRequestDTO requestDTO) {
-        Double originalPrice = requestDTO.getTotalMedicinePrice();
+    @Value("${app.branch-name:N/A}")
+    private String branchName;
 
-        // Công thức: Tiền thuế = Tổng tiền * (VAT / 100)
-        Double vatAmount = originalPrice * (vatRate / 100);
-        Double finalPrice = originalPrice + vatAmount;
+    @Override
+    public BillResponseDTO createBill(BillRequestDTO requestDTO) {
+
+        double subTotal = 0.0;
+
+        for (BillItemDTO item : requestDTO.getItems()) {
+            Medicine medicine = medicineRepository.findById(item.getMedicineId())
+                    .orElseThrow(() -> new RuntimeException(
+                            "Không tìm thấy thuốc với ID: " + item.getMedicineId()));
+
+            subTotal += medicine.getPrice() * item.getQuantity();
+        }
+
+        // Công thức: tổng tiền thuốc + % thuế VAT của tổng tiền thuốc
+        double vatAmount = subTotal * (vatRate / 100);
+        double totalAmount = subTotal + vatAmount;
 
         return BillResponseDTO.builder()
-                .originalPrice(originalPrice)
+                .subTotal(subTotal)
                 .vatRate(vatRate)
-                .finalPrice(finalPrice)
+                .vatAmount(vatAmount)
+                .totalAmount(totalAmount)
+                .branchName(branchName)
                 .build();
     }
 }

@@ -2,13 +2,12 @@ package re.edu.pharmacyservice.dto.request;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BillRequestDTO {
-    private List<BillItemDTO> items;
+public class BillItemDTO {
+    private Long medicineId;
+    private Integer quantity;
 }

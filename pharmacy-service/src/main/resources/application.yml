@@ -9,4 +9,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,refresh"
+        include: refresh,health,info   # Mở endpoint /actuator/refresh
+  endpoint:
+    health:
+      show-details: always
